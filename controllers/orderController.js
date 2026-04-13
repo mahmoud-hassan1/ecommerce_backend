@@ -168,3 +168,35 @@ export const deleteOrder = async (req, res) => {
     throw new ApiError(500, err.message);
   }
 };
+
+
+export const countMyOrders = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const count = await Order.countDocuments({ customer: userId });
+
+    return res.status(200).json({
+      success: true,
+      data: { count },
+      message: "Your orders counted successfully"
+    });
+
+  } catch (err) {
+    throw new ApiError(500, err.message);
+  }
+};
+
+export const getMyOrders = async (req, res) => {
+  const userId = req.user.id;
+
+  const orders = await Order.find({ customer: userId })
+    .sort({ createdAt: -1 })
+    .populate("items.product");
+
+  return res.status(200).json({
+    success: true,
+    data: orders,
+    message: "Your orders retrieved successfully"
+  });
+};

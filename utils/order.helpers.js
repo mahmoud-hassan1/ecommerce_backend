@@ -1,4 +1,4 @@
-import ApiError from "./ApiError";
+import ApiError from "./ApiError.js";
 import Product from "../models/Product.js";
 
 export const normalizePaymentMethod = (method = "") => {
@@ -101,4 +101,3 @@ export const decreaseProductStockForOrder = async (items = []) => {
         await product.save();
     }
 };
-

@@ -6,7 +6,7 @@ export const createUser = async (req, res) => {
         if(username && email && password ){
             const existingUserWithUsername = await User.findOne({ username });
             const existingUserWithEmail = await User.findOne({ email });
-            if(existingUser){
+            if(existingUserWithUsername){
                 throw new ApiError(400, "username already exists");
             }
             if(existingUserWithEmail){

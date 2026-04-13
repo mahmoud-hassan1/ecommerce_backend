@@ -1,7 +1,7 @@
 import ApiError from "./ApiError";
 import Product from "../models/Product.js";
 
-const normalizePaymentMethod = (method = "") => {
+export const normalizePaymentMethod = (method = "") => {
     const map = {
         cash: "CASH",
         card: "CARD",
@@ -11,13 +11,13 @@ const normalizePaymentMethod = (method = "") => {
     return map[String(method).toLowerCase()] || "CASH";
 };
 
-const normalizeOrderStatus = (status = "") => {
+export const normalizeOrderStatus = (status = "") => {
     const allowed = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
     const normalized = String(status).toUpperCase();
     return allowed.includes(normalized) ? normalized : "PENDING";
 };
 
-const buildOrderItemsFromRequest = async (orderItems = []) => {
+export const buildOrderItemsFromRequest = async (orderItems = []) => {
     if (!Array.isArray(orderItems) || orderItems.length === 0) {
         throw new ApiError(400, "orderItems must be a non-empty array");
     }
@@ -75,7 +75,7 @@ const buildOrderItemsFromRequest = async (orderItems = []) => {
     return builtItems;
 };
 
-const decreaseProductStockForOrder = async (items = []) => {
+export const decreaseProductStockForOrder = async (items = []) => {
     for (const item of items) {
         const product = await Product.findById(item.product);
         if (!product) continue;
@@ -102,9 +102,3 @@ const decreaseProductStockForOrder = async (items = []) => {
     }
 };
 
-module.exports = {
-    normalizePaymentMethod,
-    normalizeOrderStatus,
-    buildOrderItemsFromRequest,
-    decreaseProductStockForOrder,
-};

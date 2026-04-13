@@ -13,7 +13,10 @@ app.use("/",mainRouter);
 app.use((err,req,res,next)=>{
   const statusCode = err.statusCode || 500;
   return res.status(statusCode).json({
-    ...err
+    success: err.success,
+    message: err.message,
+    errors: err.errors,
+    stack: err.stack,
   });
 });
 app.listen(3000, () => {

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import bcrypt from "bcryptjs";
 const customerSchema = new mongoose.Schema(
     {
         username: {
@@ -48,6 +48,12 @@ const customerSchema = new mongoose.Schema(
         versionKey: false,
     }
 );
-
+customerSchema.pre('save', async function(next){
+    this.password = await bcrypt.hash(this.password, 10);
+});
+customerSchema.methods.comparePassword = async function(candidatePassword){
+    return await bcrypt.compare(candidatePassword, this.password);
+}
 const Customer=mongoose.model('Customer', customerSchema);
+
 export default Customer;

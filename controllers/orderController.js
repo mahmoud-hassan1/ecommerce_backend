@@ -36,12 +36,8 @@ export const createOrder = async (req, res) => {
     });
 
     await decreaseProductStockForOrder(items);
-    
-    return res.status(201).json({
-        success: true,
-        data: order,
-        message: "Order created successfully"
-    });
+
+    return res.status(201).json(new ApiResponse(201, order, "Order created successfully"));
   } catch (err) {
     throw new ApiError(400, err.message);
   }
@@ -54,12 +50,8 @@ export const getAllOrders = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate("customer")
       .populate("items.product");
-    
-    return res.status(200).json({
-        success: true,
-        data: orders,
-        message: "Orders retrieved successfully"
-    });
+
+    return res.status(200).json(new ApiResponse(200, orders, "Orders retrieved successfully"));
   } catch (err) {
     throw new ApiError(500, err.message);
   }
@@ -80,11 +72,7 @@ export const getOrdersByCustomerId = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate("items.product");
 
-    return res.status(200).json({
-        success: true,
-        data: orders,
-        message: "Customer orders retrieved successfully"
-    });
+    return res.status(200).json(new ApiResponse(200, orders, "Customer orders retrieved successfully"));
   } catch (err) {
     throw new ApiError(500, err.message);
   }
@@ -94,11 +82,7 @@ export const countOrders = async (req, res) => {
   try {
     const count = await Order.countDocuments();
 
-    return res.status(200).json({
-        success: true,
-        data: { count },
-        message: "Total orders counted successfully"
-    })
+    return res.status(200).json(new ApiResponse(200, { count }, "Total orders counted successfully"));
   } catch (err) {
     throw new ApiError(500, err.message);
   }
@@ -110,11 +94,7 @@ export const countOrdersByCustomer = async (req, res) => {
 
     const count = await Order.countDocuments({ customer: customerId });
 
-    return res.status(200).json({
-        success: true,
-        data: { customerId, count },
-        message: "Orders counted successfully"
-    });
+    return res.status(200).json(new ApiResponse(200, { customerId, count }, "Customer orders counted successfully"));
   } catch (err) {
     throw new ApiError(500, err.message);
   }
@@ -139,11 +119,8 @@ export const updateOrder = async (req, res) => {
     if (!updatedOrder) {
       throw new ApiError(404, "Order not found");
     }
-    return res.status(200).json({
-        success: true,
-        data: updatedOrder,
-        message: "Order updated successfully"
-    });
+
+    return res.status(200).json(new ApiResponse(200, updatedOrder, "Order updated successfully"));
   } catch (err) {
     throw new ApiError(400, err.message);
   }
@@ -159,11 +136,7 @@ export const deleteOrder = async (req, res) => {
       throw new ApiError(404, "Order not found");
     }
 
-    return res.status(200).json({
-        success: true,
-        data: order,
-        message: "Order deleted successfully"
-    });
+    return res.status(200).json(new ApiResponse(200, order, "Order deleted successfully"));
   } catch (err) {
     throw new ApiError(500, err.message);
   }
@@ -176,11 +149,7 @@ export const countMyOrders = async (req, res) => {
 
     const count = await Order.countDocuments({ customer: userId });
 
-    return res.status(200).json({
-      success: true,
-      data: { count },
-      message: "Your orders counted successfully"
-    });
+    return res.status(200).json(new ApiResponse(200, { count }, "Your orders counted successfully"));
 
   } catch (err) {
     throw new ApiError(500, err.message);
@@ -188,15 +157,15 @@ export const countMyOrders = async (req, res) => {
 };
 
 export const getMyOrders = async (req, res) => {
-  const userId = req.user.id;
+  try {
+    const userId = req.user.id;
 
   const orders = await Order.find({ customer: userId })
     .sort({ createdAt: -1 })
     .populate("items.product");
 
-  return res.status(200).json({
-    success: true,
-    data: orders,
-    message: "Your orders retrieved successfully"
-  });
+  return res.status(200).json(new ApiResponse(200, orders, "Your orders retrieved successfully"));
+  }catch (err) {
+    throw new ApiError(500, err.message);
+  }
 };

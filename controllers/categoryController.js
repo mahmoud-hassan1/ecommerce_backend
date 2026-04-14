@@ -7,7 +7,7 @@ export const createCategory = async (req, res) => {
     const { name, slug } = req.body;
     const category = await Category.create({ name, slug });
 
-    return ApiResponse(201, category, "Category created successfully");
+    return res.status(201).json(new ApiResponse(201, category, "Category created successfully"));
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -19,7 +19,7 @@ export const createCategory = async (req, res) => {
 export const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
-    return ApiResponse(200, categories, "Categories fetched successfully");
+    return res.status(200).json(new ApiResponse(200, categories, "Categories fetched successfully"));
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -35,7 +35,7 @@ export const getCategoryById = async (req, res) => {
     if (!category) {
       throw new ApiError(404, "Category not found");
     }
-    return ApiResponse(200, category, "Category fetched successfully");
+    return res.status(200).json(new ApiResponse(200, category, "Category fetched successfully"));
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -52,7 +52,7 @@ export const updateCategoryById = async (req, res) => {
     if (!category) {
       throw new ApiError(404, "Category not found");
     }
-    return ApiResponse(200, category, "Category updated successfully");
+    return res.status(200).json(new ApiResponse(200, category, "Category updated successfully"));
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -68,7 +68,7 @@ export const deleteCategoryById = async (req, res) => {
     if (!category) {
       throw new ApiError(404, "Category not found");
     }
-    return ApiResponse(200, category, "Category deleted successfully");
+    return res.status(200).json(new ApiResponse(200, category, "Category deleted successfully"));
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;

@@ -4,11 +4,16 @@ import { createProduct,
     getProductById, 
     updateProduct, 
     deleteProduct} from "../controllers/ProductController.js";
-const router = express.Router();
-router.post('/',createProduct)
-router.get('/',getAllProducts)
+import authMiddleware from "../middleware/auth.js";
+import authorize from "../middleware/authorize.js";
 
-router.get('/:id',getProductById)
-router.delete('/:id',deleteProduct);
-router.patch('/:id' ,updateProduct);
+const router = express.Router();
+
+router.get('/', getAllProducts);
+router.get('/:id', getProductById);
+
+router.post('/', authMiddleware, authorize('ADMIN'), createProduct);
+router.patch('/:id', authMiddleware, authorize('ADMIN'), updateProduct);
+router.delete('/:id', authMiddleware, authorize('ADMIN'), deleteProduct);
+
 export default router;

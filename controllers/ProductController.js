@@ -1,4 +1,5 @@
 import Product from "../models/Product.js";
+import Category from "../models/Category.js";
 
 export const createProduct = async (req, res, next) => {
     try {
@@ -18,7 +19,7 @@ export const createProduct = async (req, res, next) => {
 export const getAllProducts = async (req, res, next) => {
     try {
         const products = await Product.find()
-        //.populate('category');
+         .populate("category");
         res.status(200).json({
             success: true,
             results: products.length,
@@ -31,8 +32,7 @@ export const getAllProducts = async (req, res, next) => {
 
 export const getProductById = async (req, res, next) => {
     try {
-        const product = await Product.findById(req.params.id)
-        //.populate('category');
+        const product = await Product.findById(req.params.id).populate("category");
         
         if (!product) {
             const error = new Error("Product not found");

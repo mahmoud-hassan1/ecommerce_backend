@@ -112,9 +112,7 @@ export const updateOrder = async (req, res) => {
         new: true,
         runValidators: true,
       }
-    )
-      .populate("customer")
-      .populate("items.product");
+    ).populate("customer")
 
     if (!updatedOrder) {
       throw new ApiError(404, "Order not found");

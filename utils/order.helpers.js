@@ -1,5 +1,6 @@
 import ApiError from "./ApiError.js";
 import Product from "../models/Product.js";
+import color from "../models/Color.js";
 
 export const normalizePaymentMethod = (method = "") => {
     const map = {

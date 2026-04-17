@@ -1,6 +1,6 @@
 import Product from "../models/Product.js";
 import Category from "../models/Category.js";
-
+import ApiResponse from "../utils/ApiResponse.js";
 export const createProduct = async (req, res, next) => {
     try {
         const product = await Product.create(req.body);
@@ -18,39 +18,43 @@ export const createProduct = async (req, res, next) => {
 
 export const getAllProducts = async (req, res, next) => {
     try {
+        const { search, sort } = req.query;
         const page = Number(req.query.page) || undefined;
         const limit = Number(req.query.limit) || 10;
         const skip = (page - 1) * limit;
-        let products = null;
+        
         let totalProducts = null;
-        if(page){
-            products = await Product.find().skip(skip).limit(limit).populate("category");
+        let productsQuery = Product.find().populate("category");
+        let searchQuery = {}; 
+        if (search) {
+            searchQuery = {
+                $or: [
+                    { name: { $regex: search, $options: "i" } },
+                    { description: { $regex: search, $options: "i" } }
+                ],
+            };
+            productsQuery = productsQuery.find(searchQuery);
+            
         }
-        else{
-         products = await Product.find()
-         .populate("category");
+        if (sort) {
+            const sortBy = sort.split(",").join(" ");
+            productsQuery = productsQuery.sort(sortBy);
         }
-        if(!products){
+        if (page) {
+            productsQuery = productsQuery.skip(skip).limit(limit);
+        }
+
+        let products = await productsQuery;
+        
+        if (!products) {
             products = [];
         }
-        totalProducts = await Product.countDocuments();
+        totalProducts = await Product.countDocuments(searchQuery);
         let totalPages = Math.ceil(totalProducts / limit);
-        if(page){
-        res.status(200).json({
-            success: true,
-            data: products,
-            totalProducts: totalProducts,
-            totalPages: totalPages,
-            currentPage: page,
-            limit: limit
-        });
-    }
-    else{
-        res.status(200).json({
-            success: true,
-            data: products,
-        });
-    }
+        return res.status(200).json(
+            new ApiResponse(200, products, "Products fetched successfully", totalProducts, page, limit, totalPages)
+        );
+
     } catch (error) {
         next(error);
     }

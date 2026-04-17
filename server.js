@@ -6,11 +6,12 @@ import dns from "node:dns/promises";
 import errorHandler from "./middleware/errorHandler.js";
 import notFoundHandler from "./middleware/notFoundHandler.js";
 import logger from "./middleware/logger.js";
+import rateLimiter from "./middleware/rateLimiter.js";
 dns.setServers(["1.1.1.1", "8.8.8.8"])
 dotenv.config();
 
 const app = express();
-
+app.use(rateLimiter);
 app.use(express.json());
 app.use(logger);
 app.use("/",mainRouter);

@@ -48,7 +48,7 @@ export const updateCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, slug } = req.body;
-    const category = await Category.findByIdAndUpdate(id, { name, slug }, { new: true });
+    const category = await Category.findByIdAndUpdate(id, { name, slug }, { returnDocument: "after" });
     if (!category) {
       throw new ApiError(404, "Category not found");
     }

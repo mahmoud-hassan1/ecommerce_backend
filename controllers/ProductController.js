@@ -18,13 +18,39 @@ export const createProduct = async (req, res, next) => {
 
 export const getAllProducts = async (req, res, next) => {
     try {
-        const products = await Product.find()
+        const page = Number(req.query.page) || undefined;
+        const limit = Number(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        let products = null;
+        let totalProducts = null;
+        if(page){
+            products = await Product.find().skip(skip).limit(limit).populate("category");
+        }
+        else{
+         products = await Product.find()
          .populate("category");
+        }
+        if(!products){
+            products = [];
+        }
+        totalProducts = await Product.countDocuments();
+        let totalPages = Math.ceil(totalProducts / limit);
+        if(page){
         res.status(200).json({
             success: true,
-            results: products.length,
-            data: products
+            data: products,
+            totalProducts: totalProducts,
+            totalPages: totalPages,
+            currentPage: page,
+            limit: limit
         });
+    }
+    else{
+        res.status(200).json({
+            success: true,
+            data: products,
+        });
+    }
     } catch (error) {
         next(error);
     }
@@ -53,7 +79,7 @@ export const getProductById = async (req, res, next) => {
 export const updateProduct = async (req, res, next) => {
     try {
         const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
+            returnDocument: "after",
             runValidators: true
         });
 

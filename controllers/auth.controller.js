@@ -1,7 +1,7 @@
 import ApiError from "../utils/ApiError.js";
 import User from "../models/Customer.js";
 import jwt from "jsonwebtoken";
-
+import ApiResponse from "../utils/ApiResponse.js";
 const getToken = (user) => {
     return jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET,{ expiresIn: process.env.JWT_EXPIRES_IN });
 }
@@ -13,24 +13,20 @@ export const createUser = async (req, res) => {
             const existingUserWithEmail = await User.findOne({ email });
             if(existingUserWithUsername){
                 throw new ApiError(409, "username already exists");
-            }
+            }   
             if(existingUserWithEmail){
                 throw new ApiError(409, "email already exists");
             }
             const user = await User.create({ username, email, password, role , name, phone});
+            user.password = undefined;
             const token = getToken(user);
-          
-            return res.status(201).json({
-                success: true,
-                message: "User created successfully",
-                token,
-                data: user
-            });
+            return res.status(201).json(new ApiResponse(201, {user, token}, "User created successfully"));
         }
         else{
             throw new ApiError(400, "Username, email and password are required");
         }
 }
+
 export const loginUser = async (req, res) => {
     const { email,username, password } = req.body;
     if(!(email || username) && !password){
@@ -52,10 +48,6 @@ export const loginUser = async (req, res) => {
         throw new ApiError(401, "Invalid Credentials");
     }
     const token = getToken(user);
-    return res.status(200).json({
-        success: true,
-        message: "Login successful",
-        token,
-        data: user
-    });
+    user.password = undefined;
+    return res.status(200).json(new ApiResponse(200, {user, token}, "Login successful"));
 }

@@ -1,0 +1,10 @@
+import express from "express";
+import { getUserInfo, getUserById, getUsers, deleteUser } from "../controllers/user.controller.js";
+import authMiddleware from "../middleware/auth.js";
+import authorize from "../middleware/authorize.js";
+const router = express.Router();
+router.get("/info", authMiddleware, getUserInfo);
+router.get("/:id", authMiddleware, authorize(["ADMIN"]), getUserById);
+router.get("/", authMiddleware, authorize(["ADMIN"]), getUsers);
+router.delete("/:id", authMiddleware, authorize(["ADMIN"]), deleteUser);
+export default router;

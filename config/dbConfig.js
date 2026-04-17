@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 export const connectDB = async () => {
     try{
         console.log();
@@ -8,6 +9,6 @@ export const connectDB = async () => {
     console.log('Connected to MongoDB');
     }
     catch(err){
-        console.log(err);
+        console.log("Error connecting to MongoDB", err);
     }
 }

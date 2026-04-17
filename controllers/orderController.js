@@ -46,12 +46,39 @@ export const createOrder = async (req, res) => {
 
 export const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find()
-      .sort({ createdAt: -1 })
+    const { search, sort } = req.query;
+    const page = Number(req.query.page) || undefined;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    let totalOrders = null; 
+    let ordersQuery = Order.find()
       .populate("customer")
       .populate("items.product");
+    let searchQuery = {};
+    if (search) {
+      searchQuery = {
+        $or: [
+          { "items.productTitle": { $regex: search, $options: "i" } },
+        ],  
+      };
+      ordersQuery = ordersQuery.find(searchQuery);
+    }
+    if (sort) {
+      const sortBy = sort.split(",").join(" ");
+      ordersQuery = ordersQuery.sort(sortBy);
+    } else {
+      ordersQuery = ordersQuery.sort({ createdAt: -1 }); 
+    }
+    if (page) {
+      ordersQuery = ordersQuery.skip(skip).limit(limit);
+    }
+    let orders = await ordersQuery;
+    totalOrders = await Order.countDocuments(searchQuery);
+    let totalPages = Math.ceil(totalOrders / limit);
 
-    return res.status(200).json(new ApiResponse(200, orders, "Orders retrieved successfully"));
+    return res.status(200).json(
+      new ApiResponse(200, orders, "Orders retrieved successfully", totalOrders, page, limit, totalPages)
+    );
   } catch (err) {
     throw new ApiError(500, err.message);
   }

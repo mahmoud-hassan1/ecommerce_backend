@@ -41,13 +41,15 @@ export const getUserById = async (req, res) => {
     return res.status(200).json(new ApiResponse(200, user, "User fetched successfully"));
 }
 export const deleteUser = async (req, res) => {
-    await User.findByIdAndDelete(req.params.id);
+    const user = await User.findById(req.params.id);
     if(!user){
         throw new ApiError(404, "User not found");
     }
+    await User.findByIdAndDelete(req.params.id);
     return res.status(200).json(new ApiResponse(200, null, "User deleted successfully"));
 }
 export const getUserInfo = async (req, res) => {
+
     const user = await User.findById(req.user.id);
     return res.status(200).json(new ApiResponse(200, user, "User fetched successfully"));
 }

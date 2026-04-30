@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { connectDB } from "./config/dbConfig.js";
 import dotenv from "dotenv";
 import mainRouter from "./routes/index.js";
@@ -11,6 +12,7 @@ dns.setServers(["1.1.1.1", "8.8.8.8"])
 dotenv.config();
 
 const app = express();
+app.use(cors({ origin: "http://localhost:4200" }));
 app.use(rateLimiter);
 app.use(express.json());
 app.use(logger);

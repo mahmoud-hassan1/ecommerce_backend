@@ -1,6 +1,7 @@
 import Product from "../models/Product.js";
 import Category from "../models/Category.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import mongoose from "mongoose";
 export const createProduct = async (req, res, next) => {
     try {
         const product = await Product.create(req.body);
@@ -119,6 +120,29 @@ export const deleteProduct = async (req, res, next) => {
             success: true,
             message: "Product deleted successfully"
         });
+    } catch (error) {
+        next(error);
+    }
+};
+export const getProductsByIds = async (req, res, next) => {
+    try {
+        const ids = req.body?.ids;
+        if (!Array.isArray(ids) || ids.length === 0) {
+            const error = new Error("ids must be a non-empty array");
+            error.statusCode = 400;
+            error.success = false;
+            return next(error);
+        }
+
+        const invalidId = ids.find((id) => !mongoose.Types.ObjectId.isValid(id));
+        if (invalidId) {
+            const error = new Error(`Invalid product id: ${invalidId}`);
+            error.statusCode = 400;
+            error.success = false;
+            return next(error);
+        }
+        const products = await Product.find({ _id: { $in: ids } }).populate("category");
+        return res.status(200).json(new ApiResponse(200, products, "Products fetched successfully"));
     } catch (error) {
         next(error);
     }

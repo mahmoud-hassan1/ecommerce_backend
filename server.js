@@ -3,7 +3,6 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
-import cors from "cors";
 import { connectDB } from "./config/dbConfig.js";
 import mainRouter from "./routes/index.js";
 import dns from "node:dns/promises";
@@ -22,7 +21,7 @@ const app = express();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 app.use(cors({ origin: "http://localhost:4200" }));
-app.use(rateLimiter);
+// app.use(rateLimiter);
 app.use(express.json());
 
 app.use(cors({

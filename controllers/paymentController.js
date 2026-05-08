@@ -24,6 +24,8 @@ export const createCheckoutSession = async (req, res) => {
             0
         );
 
+        // Stripe requires integer minor units; e.g. 19.9 * 100 → 1989.999… in JS floats.
+        const toMinorUnits = (major) => Math.round(Number(major) * 100);
 
         const session = await stripe.checkout.sessions.create({
             mode: "payment",
@@ -35,7 +37,7 @@ export const createCheckoutSession = async (req, res) => {
                     product_data: {
                         name: item.productTitle,
                     },
-                    unit_amount: item.lineTotal * 100,
+                    unit_amount: toMinorUnits(item.lineTotal),
                 },
                 quantity: 1,
             })),
